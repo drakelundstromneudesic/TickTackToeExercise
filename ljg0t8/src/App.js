@@ -3,6 +3,9 @@ import { useState } from "react";
 export default function Board() {
   const [squares, setSquares] = useState(Array(9).fill(null));
   function handleClick(i) {
+    if (squares[i]) {
+      return;
+    }
     let newValue = null
     if (squares[i]==null) {
       newValue=('X');
