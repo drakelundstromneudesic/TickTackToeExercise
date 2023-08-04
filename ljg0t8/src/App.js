@@ -5,26 +5,36 @@ export default function Game() {
   const [currentMove, setCurrentMove] = useState(0);
   const currentSquares = history[currentMove];
   const xIsNext = currentMove % 2 === 0;
+  const [isAscending, setIsAscending] = useState(true);
   function handlePlay(nextSquares) {
     const nextHistory = [...history.slice(0, currentMove + 1), nextSquares];
     setHistory(nextHistory);
     setCurrentMove(nextHistory.length - 1);
+    console.log(history.length)
   }
 
   function jumpTo(nextMove) {
     setCurrentMove(nextMove);
   }
 
-  const moves = history.map((squares, move) => {
+  const moves =history.map((squares, move) => {
     let description;
-    if (move > 0) {
-      description = "Go to move #" + move;
+    if (isAscending) {
+      if (move > 0) {
+        description = "Go to move #" + move;
+      } else {
+        description = "Go to game start";
+      }
+    } else {
+    if (move < history.length-1) {
+      description = "Go to move #" + (history.length-move-1);
     } else {
       description = "Go to game start";
     }
+  }
     return (
       <li key={move}>
-        <button onClick={() => jumpTo(move)}>{description}</button>
+        <button onClick={() => jumpTo((isAscending? move:(history.length-move-1)))}>{description}</button>
       </li>
     );
   });
@@ -35,6 +45,7 @@ export default function Game() {
         <Board xIsNext={xIsNext} squares={currentSquares} onPlay={handlePlay} />
       </div>
       <div className="game-info">
+        <button onClick={() => setIsAscending(!isAscending)}>Ascending/Decending</button>
         <ol>{moves}</ol>
         <ol>You are at move {currentMove}</ol>
       </div>
@@ -62,10 +73,13 @@ function Board({ xIsNext, squares, onPlay }) {
   }
 
   const winner = calculateWinner(squares);
+  const draw = !(squares.some(item => item === null));
   let status;
   if (winner) {
     status = "Winner: " + winner;
-  } else {
+  } else if (draw) {
+    status = "It's a draw";
+  } else  {
     status = "Next player: " + (xIsNext ? "X" : "O");
   }
 
@@ -75,7 +89,6 @@ function Board({ xIsNext, squares, onPlay }) {
     [6, 7, 8],
   ];
 
-
   return (
     <>
       <div className="status">{status}</div>
@@ -83,7 +96,7 @@ function Board({ xIsNext, squares, onPlay }) {
         <div key={row} className="board-row">
           {row.map((tile) => (
             <Square
-            key={tile}
+              key={tile}
               value={squares[tile]}
               onSquareClick={() => handleClick(tile)}
             />
