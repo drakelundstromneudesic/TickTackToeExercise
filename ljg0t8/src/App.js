@@ -16,28 +16,55 @@ export default function Game() {
     setCurrentMove(nextMove);
   }
 
+function moveCompare(move) {
+  const thisRound = history[move]
+  const previousRound = history[move-1]
+
+  let whoMoved = ""
+let column = ""
+let row = ""
+
+
+  for (let i = 0; i < thisRound.length; i++) {
+if (thisRound[i] != previousRound[i]) {
+  whoMoved = thisRound[i]
+  column = ((i%3)+1).toString()
+  row = (Math.floor(i/3)+1).toString()
+}
+  }
+  return [whoMoved, column, row]
+}
+
   const moves = history.map((squares, move) => {
     let description;
+    let moveLocation = "";
     if (isAscending) {
       if (move > 0) {
         description = "Go to move #" + move;
+        const moveCompareResults = moveCompare(move)
+        moveLocation= `  ${moveCompareResults[0]} played at Column ${moveCompareResults[1]}, Row ${moveCompareResults[2]}`;
       } else {
         description = "Go to game start";
       }
     } else {
       if (move < history.length - 1) {
         description = "Go to move #" + (history.length - move - 1);
+        const moveCompareResults = moveCompare(history.length - move - 1)
+        moveLocation= `  ${moveCompareResults[0]} played at Column ${moveCompareResults[1]}, Row ${moveCompareResults[2]}`;
       } else {
         description = "Go to game start";
       }
     }
     return (
       <li key={move}>
+        <div style={{display:"flex"}}>
         <button
           onClick={() => jumpTo(isAscending ? move : history.length - move - 1)}
         >
           {description}
         </button>
+        <div style={{paddingLeft: 5}}>{moveLocation}</div>
+        </div>
       </li>
     );
   });
