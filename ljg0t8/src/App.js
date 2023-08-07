@@ -10,14 +10,13 @@ export default function Game() {
     const nextHistory = [...history.slice(0, currentMove + 1), nextSquares];
     setHistory(nextHistory);
     setCurrentMove(nextHistory.length - 1);
-    console.log(history.length)
   }
 
   function jumpTo(nextMove) {
     setCurrentMove(nextMove);
   }
 
-  const moves =history.map((squares, move) => {
+  const moves = history.map((squares, move) => {
     let description;
     if (isAscending) {
       if (move > 0) {
@@ -26,15 +25,19 @@ export default function Game() {
         description = "Go to game start";
       }
     } else {
-    if (move < history.length-1) {
-      description = "Go to move #" + (history.length-move-1);
-    } else {
-      description = "Go to game start";
+      if (move < history.length - 1) {
+        description = "Go to move #" + (history.length - move - 1);
+      } else {
+        description = "Go to game start";
+      }
     }
-  }
     return (
       <li key={move}>
-        <button onClick={() => jumpTo((isAscending? move:(history.length-move-1)))}>{description}</button>
+        <button
+          onClick={() => jumpTo(isAscending ? move : history.length - move - 1)}
+        >
+          {description}
+        </button>
       </li>
     );
   });
@@ -45,7 +48,9 @@ export default function Game() {
         <Board xIsNext={xIsNext} squares={currentSquares} onPlay={handlePlay} />
       </div>
       <div className="game-info">
-        <button onClick={() => setIsAscending(!isAscending)}>Ascending/Decending</button>
+        <button onClick={() => setIsAscending(!isAscending)}>
+          Ascending/Decending
+        </button>
         <ol>{moves}</ol>
         <ol>You are at move {currentMove}</ol>
       </div>
@@ -73,13 +78,13 @@ function Board({ xIsNext, squares, onPlay }) {
   }
 
   const winner = calculateWinner(squares);
-  const draw = !(squares.some(item => item === null));
+  const draw = !squares.some((item) => item === null);
   let status;
   if (winner) {
-    status = "Winner: " + (xIsNext?"O":"X");
+    status = "Winner: " + (xIsNext ? "O" : "X");
   } else if (draw) {
     status = "It's a draw";
-  } else  {
+  } else {
     status = "Next player: " + (xIsNext ? "X" : "O");
   }
 
@@ -98,7 +103,9 @@ function Board({ xIsNext, squares, onPlay }) {
             <Square
               key={tile}
               value={squares[tile]}
-textColor={"blue"}
+              textColor={
+                winner ? (winner.includes(tile) ? "blue" : "black") : "black"
+              }
               onSquareClick={() => handleClick(tile)}
             />
           ))}
@@ -109,9 +116,12 @@ textColor={"blue"}
 }
 
 function Square({ value, onSquareClick, textColor }) {
-  // pass in winners as array and do logic here to check for victory box.  Then change styling
   return (
-    <button className="square" onClick={onSquareClick} style={{color:textColor}}>
+    <button
+      className="square"
+      onClick={onSquareClick}
+      style={{ color: textColor }}
+    >
       {value}
     </button>
   );
